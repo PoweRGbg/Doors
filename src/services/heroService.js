@@ -100,7 +100,7 @@ export async function getHeroes() {
 
 export async function getHeroById(id) {
     try {
-        let heroes = await fetch(url + "data/heroes/"+id, {
+        let heroes = await fetch(url + "details/"+id, {
             method: 'GET'
         });
         let result = await heroes.json();
