@@ -1,0 +1,29 @@
+Hero.table   {
+  color: white;
+  text-align: right;
+  font-size: 5cm;
+  }
+
+  .blinkingRed{
+    animation:blinkingRed 0.8s infinite;
+  }
+
+  .blinkingOrange{
+    animation:blinkingOrange 0.8s infinite;
+  }
+  @keyframes blinkingRed{
+    0%{		color: rgb(255, 0, 0);	}
+    49%{	color: rgb(255, 0, 0);	}
+    50%{	color: transparent;	}
+    99%{	color: transparent;	}
+    100%{	color: rgb(255, 0, 0);	}
+  }
+
+
+  @keyframes blinkingOrange{
+    0%{		color: rgb(255, 155, 5);	}
+    49%{	color: rgb(255, 155, 5);	}
+    50%{	color: transparent;	}
+    99%{	color: transparent;	}
+    100%{	color: rgb(255, 155, 5);	}
+  }
