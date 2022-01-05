@@ -112,7 +112,7 @@ export default function HeroDetails({ match }) {
             <div className="row tm-edit-product-row">
               <div className="col-xl-6 col-lg-6 col-md-12">
                 <div className="form-group mb-3">
-                  <center>ERROR FETCHING MEAL!</center>
+                  <center>ERROR FETCHING HERO FROM DATABASE!</center>
                 </div>
               </div>
             </div>
