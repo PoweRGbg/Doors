@@ -1,26 +1,32 @@
 import "../css/herostyle.css";
-import { useState, useEffect } from "react";
-import { getHeroById } from "../services/heroService.js";
+import AuthContext from "../contexts/AuthContext";
+import { useState, useEffect, useContext } from "react";
+import { getHeroById, editHero } from "../services/heroService.js";
 import Timer from "./Timer";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 export default function HeroCard({ match }) {
+  const { user } = useContext(AuthContext);
   let [hero, setHero] = useState();
   let [goblin, setGoblin] = useState(initialGoblin());
+  let [render, setRender] = useState(1);
   // let [gold, setGold] = useState(0);
   let [lastAction] = useState(Date.now());
-//   const forceUpdate = useForceUpdate();
+  const historyHook = useHistory();
+  //   const forceUpdate = useForceUpdate();
 
   useEffect(() => {
     getHeroById(match.params.heroId)
       .then((result) => {
-        console.log(`HEro is now ${JSON.stringify(result)}`);
+        // console.log(`Hero is now ${JSON.stringify(result)}`);
         // set max health
-        result.maxLife = result.life * 100;
+        result.maxLife = result.health * 100;
         setHero(result);
       })
-      .then(window.scrollTo(0, 0));
-      setGoblin();
-  }, [match.params.heroId]);
+      .then((e) => {
+        window.scrollTo(0, 0);
+      });
+  }, [match.params.heroId, goblin]);
 
   function initialGoblin() {
     let goblin = {
@@ -33,16 +39,47 @@ export default function HeroCard({ match }) {
     return goblin;
   }
 
-  //create your forceUpdate hook
-//   function useForceUpdate() {
-//     const [value, setValue] = useState(0); // integer state
-//     return () => setValue((value) => value + 1); // update the state to force render
-//   }
+  function attackButtonHandler() {
+    let newGoblin = goblin;
+    let newHero = hero;
+    newGoblin.health -= hero.attack;
+    setGoblin(newGoblin);
+    console.log(
+      `NewGoblin is ${newGoblin.health} health left Goblin is ${goblin.health}`
+    );
+    if (goblin.health === 0) {
+      // goblin is dead
+      //add gold
+      console.log(`Goblin is dead getting ${goblin.gold}`);
+      newHero.gold += goblin.gold;
+      saveHero();
+    } else {
+      console.log(`Goblin after damage ${JSON.stringify(goblin)}`);
+      // It should retaliate
+      newHero.life -= goblin.damage;
+      setHero(newHero);
+      setRender(render+1);
 
+      if (goblin.health < 1 || hero.life < 1) {
+          if(hero.life < 1){
+              saveHero();
+          }
+        historyHook.push(`/heroes/${hero._id}`);
+      }
+    }
+  }
 
+  function saveHero(){
+    // save hero to database
+    editHero(hero, user).then((updatedHero) => {
+        console.log(`Updated is ${updatedHero}`);
+        setHero(updatedHero);
+        historyHook.push(`/heroes/${hero._id}`);
+
+      });
+  }
 
   return (
-      
     <div className="col-sm-12 col-md-12 col-lg-6 col-xl-6 tm-block-col">
       <div className="tm-bg-primary-dark tm-block">
         <h2 className="tm-block-title">{match.title}</h2>
@@ -52,58 +89,61 @@ export default function HeroCard({ match }) {
           style={{
             backgroundColor: "#54657d",
             color: "#fff",
-            "textAlign": "right",
+            textAlign: "right",
             border: 0,
           }}
-        ><tbody>
-          <tr>
-            <td>Life</td>
-            <td>{hero?.life}</td>
-            <td>
-              {hero?.maxLife - hero?.life > 0 && hero?.gold > 0 && (
-                <button
-                  className="btn btn-primary btn-block text-uppercase"
-                  onClick={() => {
-                    //add random gold
-                  }}
-                >
-                  Heal for gold
-                </button>
-              )}
-            </td>
-            <td>
-              {hero?.maxLife - hero?.health > 0 &&
-                (Date.now() - hero?.lastAttackTime) / 1000 > 10 && (
+        >
+          <tbody>
+            <tr>
+              <td>Life</td>
+              <td>{hero?.life}</td>
+              <td>
+                {hero?.maxLife - hero?.life > 0 && hero?.gold > 0 && (
+                  <button
+                    className="btn btn-primary btn-block text-uppercase"
+                    onClick={() => {}}
+                  >
+                    Heal for gold {hero?.maxLife - hero?.life}
+                  </button>
+                )}
+              </td>
+              <td>
+                {hero?.maxLife - hero?.life > 0 &&
+                  (Date.now() - hero?.lastAttackTime) / 1000 > 10 && (
+                    <button
+                      className="btn btn-primary btn-block text-uppercase"
+                      onClick={() => {
+                        //add random gold
+                      }}
+                    >
+                      Heal from time
+                    </button>
+                  )}
+              </td>
+            </tr>
+            <tr>
+              <td>Gold</td>
+              <td>{hero?.gold}</td>
+            </tr>
+            <tr>
+              <td>
+                {hero?.life > 0 && goblin.health > 0 && (
                   <button
                     className="btn btn-primary btn-block text-uppercase"
                     onClick={() => {
-                      //add random gold
+                      attackButtonHandler();
                     }}
                   >
-                    Heal from time
+                    {Date.now() >= lastAction
+                      ? `Attack goblin!(${goblin?.health})`
+                      : timeLeft(
+                          lastAction,
+                          `Fight goblin!(${goblin?.health})`
+                        )}
                   </button>
                 )}
-            </td>
-          </tr>
-          <tr>
-            <td>Gold</td>
-            <td>{hero?.gold}</td>
-          </tr>
-          <tr>
-            <td>
-              {hero?.life > 0 && (
-                <button
-                  className="btn btn-primary btn-block text-uppercase"
-                  onClick={() => {
-                  }}
-                >
-                  {Date.now() >= lastAction
-                    ? `Fight goblin!(${goblin.health})`
-                    : timeLeft(lastAction, `Fight goblin!(${goblin.health})`)}
-                </button>
-              )}
-            </td>
-          </tr>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
