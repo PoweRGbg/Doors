@@ -6,7 +6,7 @@ import { useHistory } from "react-router-dom";
 import "../css/fontawesome.min.css";
 import "../css/bootstrap.min.css";
 import "../css/templatemo-style.css";
-import { allowActionEveryMin } from "../config/configuration.js";
+import { allowActionEveryMin, lifepointsEveryPeriod } from "../config/configuration.js";
 
 export default function HeroDetails({ match }) {
   const [hero, setHero] = useState({});
@@ -100,7 +100,7 @@ export default function HeroDetails({ match }) {
     let timeDifference =( Date.now() - hero.lastAction ) / 60000;
     let periods = Math.floor(timeDifference / allowActionEveryMin);
     let newHero = hero;
-      newHero.life += periods * 2;
+      newHero.life += periods * lifepointsEveryPeriod;
       if(newHero.life > newHero.maxLife)
       newHero.life = newHero.maxLife;
       newHero.lastAction = Date.now(); 
