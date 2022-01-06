@@ -1,11 +1,8 @@
 import { Link } from "react-router-dom";
-import "./MealsTableRow.css";
+import "./HeroesTableRow.css";
 
-export default function MyHeroesRow({ hero, remove }) {
+export default function MyHeroesRow({ hero }) {
 
-  function del() {
-    remove(hero);
-  }
   return (
     <tr>
       <th scope="row">
@@ -17,14 +14,7 @@ export default function MyHeroesRow({ hero, remove }) {
         </Link>
       </td>
       <td>
-        <Link to="" className="tm-product-delete-link">
-        <i
-          className="far fa-trash-alt tm-product-delete-icon tm-product-delete-link"
-          id={hero._id}
-          name={hero.name}
-          onClick={del}
-        ></i>
-        </Link>
+        
       </td>
     </tr>
   );

@@ -145,16 +145,7 @@ function MyHeroes({ user }) {
                         )}
                       </tbody>
                     </table>
-                    {heroes.length > 0 ? (
-                      <button
-                        type="submit"
-                        className="btn btn-primary btn-block text-uppercase"
-                      >
-                        Delete selected products
-                      </button>
-                    ) : (
-                      <div></div>
-                    )}
+                    
                   </form>
                 </div>
                 <Link

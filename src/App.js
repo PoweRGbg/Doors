@@ -6,6 +6,7 @@ import NotificationsList from "./components/NotificationsList";
 import MealsTable from "./components/HeroesTable";
 import HeroDetails from "./components/HeroDetails";
 import AddHeroCard from "./components/AddHeroCard";
+import HeroCard from "./components/HeroCard";
 import RegisterUser from "./components/RegisterUser";
 import Login from "./components/Login";
 import MealEdit from "./components/MealEdit";
@@ -37,6 +38,7 @@ function App() {
         <Route path="/allmeals" component={MealsTable} />
         <Route path="/meals/mymeals" component={MyHeroes} />
         <Route path="/heroes/:heroId" component={HeroDetails} />
+        <Route path="/train/:heroId" component={HeroCard} />
         <Route path="/edit/:mealId" component={MealEdit} />
         <Route path="/register" component={RegisterUser} />
         <Route path="/login" component={Login} />

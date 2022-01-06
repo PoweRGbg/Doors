@@ -7,7 +7,7 @@ export const isAuth = (Component) => {
 
   const EnhancedComponent = (props) => {
     let { user } = useContext(AuthContext);
-
+    user.email = "someone";
     if (!user)
     if (sessionStorage.getItem("email")) {
         user.email = sessionStorage.getItem("email");

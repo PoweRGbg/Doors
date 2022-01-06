@@ -1,5 +1,5 @@
 import AuthContext from "../contexts/AuthContext";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { addHero } from "../services/heroService";
 import { useHistory } from "react-router-dom";
 

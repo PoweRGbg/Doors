@@ -46,7 +46,7 @@ export default function HeroDetails({ match }) {
 
   function trainButtonHandler(e) {
     e.preventDefault();
-    historyHook.push(`/arena/${hero._id}`);
+    historyHook.push(`/train/${hero._id}`);
   }
 
   function deleteButtonHandler(e) {
@@ -205,7 +205,7 @@ export default function HeroDetails({ match }) {
                       </tbody>
                     </table>
                   </div>
-
+                  <div>{trainButton}</div>
                   <div className="row">
                     <div className="custom-file mt-3 mb-3">
                       {hero._ownerId === user._id ? ownerButtons : ""}

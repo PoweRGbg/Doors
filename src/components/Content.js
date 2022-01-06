@@ -1,25 +1,13 @@
-import MealsTable from "./HeroesTable";
 import AuthContext from "../contexts/AuthContext";
 import { useContext, useState } from "react";
-import SearchBox from "./SearchBox";
 import {Link} from "react-router-dom";
 
 export default function Content() {
-  const [results, setResults] = useState([]);
   const [noResult, setNoResults] = useState(null);
   const { user } = useContext(AuthContext);
 
-  function searchResult(mealsArray) {
-    if (mealsArray.length > 0) {
-      setResults(mealsArray);
-    } else {
-      setNoResults("No results for this search!");
-    }
-  }
 
-  function clearResult() {
-    setResults([]);
-  }
+
 
   return (
     <div className="container">

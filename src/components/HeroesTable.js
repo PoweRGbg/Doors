@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { getHeroes } from "../services/mealService";
-// import HeroesTableRow from "./HeroesTableRow";
+import HeroesTableRow from "./HeroesTableRow";
 
 export default function HeroesTable({ results, clearResult }) {
   const [heroes, setHeroes] = useState([]);
@@ -37,8 +37,8 @@ export default function HeroesTable({ results, clearResult }) {
             </tr>
           </thead>
           <tbody>
-            {/* {heroes.length > 0 &&
-              heroes.map((meal) => <HeroesTableRow meal={meal} key={meal._id} />)} */}
+             {heroes.length > 0 &&
+              heroes.map((meal) => <HeroesTableRow meal={meal} key={meal._id} />)} 
           </tbody>
         </table>
       </div>
