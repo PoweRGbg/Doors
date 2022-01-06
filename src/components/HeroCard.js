@@ -59,7 +59,6 @@ export default function HeroCard({ match }) {
       saveHero();
       historyHook.push(`/heroes/${hero._id}`);
     } else {
-      console.log(`Goblin after damage ${JSON.stringify(goblin)}`);
       // It should retaliate
       newHero.life -= goblin.damage;
       setHero(newHero);

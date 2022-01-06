@@ -15,6 +15,7 @@ export default function HeroDetails({ match }) {
   let historyHook = useHistory();
   const [note, setNote] = useState("");
   const isAdmin = false;
+  user._id = "something";
 
   useEffect(() => {
     async function fetchData() {
@@ -68,11 +69,15 @@ export default function HeroDetails({ match }) {
   }
 
   function plusButtonHandler(what, howMuch, e) {
-    console.log(`Plus button for ${what} ${howMuch}`);
+    console.log(`Plus button for ${what} with ${howMuch}`);
     let upgradedHero = hero;
     upgradedHero[what] += howMuch;
+    if(what === "health"){
+        upgradedHero.maxLife += howMuch * 10;
+    }
     upgradedHero.skillPoints -= 1;
     saveHero();
+    setRerender(rerender+1);
   }
 
   async function healButtonHandler() {
@@ -91,7 +96,7 @@ export default function HeroDetails({ match }) {
     }
     setHero(newHero);
     saveHero();
-    setRerender();
+    setRerender(rerender+1);
   }
 
   async function healButtonTimeHandler() {
