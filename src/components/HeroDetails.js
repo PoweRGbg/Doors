@@ -1,16 +1,20 @@
 import AuthContext from "../contexts/AuthContext";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useInterval } from "react";
 import { getHeroById, deleteHero, editHero } from "../services/heroService";
 import ConfirmDialog from "./ConfirmDialog.js";
 import { useHistory } from "react-router-dom";
 import "../css/fontawesome.min.css";
 import "../css/bootstrap.min.css";
 import "../css/templatemo-style.css";
-import { allowActionEveryMin, lifepointsEveryPeriod } from "../config/configuration.js";
+import {
+  allowActionEveryMin,
+  lifepointsEveryPeriod,
+} from "../config/configuration.js";
 
 export default function HeroDetails({ match }) {
   const [hero, setHero] = useState({});
-  const [rerender, setRerender] = useState();
+  const [state, setState] = useState();
+  const [rerender, setRerender] = useState(1);
   const { user } = useContext(AuthContext);
   let historyHook = useHistory();
   const [note, setNote] = useState("");
@@ -29,7 +33,17 @@ export default function HeroDetails({ match }) {
         setHero(result);
       })
       .then(window.scrollTo(0, 0));
+      const interval = setInterval(() => {
+        let secondsAgo = (Date.now() - hero.lastAction) / 1000;
+        if((secondsAgo / 60) > allowActionEveryMin ){
+            setRerender(rerender+1);
+        }
+        console.log(`Last action was ${secondsAgo}`);
+      }, 60000);
+      return () => clearInterval(interval);
   }, [match.params.heroId, rerender]);
+
+
 
   function saveHero() {
     editHero(hero, user).then((updatedHero) => {
@@ -72,12 +86,12 @@ export default function HeroDetails({ match }) {
     console.log(`Plus button for ${what} with ${howMuch}`);
     let upgradedHero = hero;
     upgradedHero[what] += howMuch;
-    if(what === "health"){
-        upgradedHero.maxLife += howMuch * 10;
+    if (what === "health") {
+      upgradedHero.maxLife += howMuch * 10;
     }
     upgradedHero.skillPoints -= 1;
     saveHero();
-    setRerender(rerender+1);
+    setRerender(rerender + 1);
   }
 
   async function healButtonHandler() {
@@ -96,19 +110,18 @@ export default function HeroDetails({ match }) {
     }
     setHero(newHero);
     saveHero();
-    setRerender(rerender+1);
+    setRerender(rerender + 1);
   }
 
   async function healButtonTimeHandler() {
     let lifeDiffernece = hero.maxLife - hero.life;
     if (lifeDiffernece === 0) return;
-    let timeDifference =( Date.now() - hero.lastAction ) / 60000;
+    let timeDifference = (Date.now() - hero.lastAction) / 60000;
     let periods = Math.floor(timeDifference / allowActionEveryMin);
     let newHero = hero;
-      newHero.life += periods * lifepointsEveryPeriod;
-      if(newHero.life > newHero.maxLife)
-      newHero.life = newHero.maxLife;
-      newHero.lastAction = Date.now(); 
+    newHero.life += periods * lifepointsEveryPeriod;
+    if (newHero.life > newHero.maxLife) newHero.life = newHero.maxLife;
+    newHero.lastAction = Date.now();
     setHero(newHero);
     saveHero();
     setRerender();
@@ -200,8 +213,8 @@ export default function HeroDetails({ match }) {
                               </button>
                             )}
                             {hero.life < hero.maxLife &&
-                              (Date.now() - hero.lastAction) / 60000 > allowActionEveryMin 
-                              && (
+                              (Date.now() - hero.lastAction) / 60000 >
+                                allowActionEveryMin && (
                                 <button
                                   type="submit"
                                   className="btn btn-primary btn-block text-uppercase col-6"
