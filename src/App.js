@@ -32,11 +32,11 @@ function App() {
     <AuthContext.Provider value={{ user: user, login, logout }}>
       <Navbar />
       <Switch>
-        <Route path="/" exact component={Content} />
+        <Route path="/" exact component={MyHeroes} />
         <Route path="/notifications" exact component={NotificationsList} />
         <Route path="/addhero" exact component={AddHeroCard} />
-        <Route path="/allmeals" component={MealsTable} />
-        <Route path="/meals/mymeals" component={MyHeroes} />
+        <Route path="/allheroes" component={MyHeroes} />
+        <Route path="/heroes/myheroes" component={MyHeroes} />
         <Route path="/heroes/:heroId" component={HeroDetails} />
         <Route path="/train/:heroId" component={HeroCard} />
         <Route path="/edit/:mealId" component={MealEdit} />
