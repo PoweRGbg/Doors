@@ -13,10 +13,10 @@ export default function AddHeroForm() {
     let newHero = {
       name: formData.get("name"),
     };
-    addHero(newHero, user).then(() => {
-      console.log(`added ${newHero.name} to database`);
-      historyHook.push("/");
+    addHero(newHero, user).then((result) => {
+      console.log(`added ${result.name} to database`);
     });
+    historyHook.push("/heroes/myheroes");
   }
 
   const handleChange = (e) => {};
