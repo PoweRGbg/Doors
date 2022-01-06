@@ -72,7 +72,7 @@ export default function Navbar() {
                 onClick={clickHandler}
               >
                 <i className="fas fa-lemon"></i>
-                All meals
+                All heroes
                 <span className="sr-only">(current)</span>
               </Link>
             </li>
@@ -103,7 +103,7 @@ export default function Navbar() {
                   {user.email ? (
                     <Link
                       className="dropdown-item"
-                      to="/meals/mymeals"
+                      to="/heroes/myheroes"
                       onClick={clickHandler}
                     >
                       My meals
