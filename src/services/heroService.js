@@ -30,7 +30,7 @@ export const addHero = async (hero, user) => {
 
 }
 export const editHero = async (hero, user) => {
-    console.log(`Updating ${JSON.stringify(hero)}`);
+    // console.log(`Updating ${JSON.stringify(hero)}`);
     try {
         let response = await fetch(url + "update", {
             method: 'PUT',
