@@ -1,17 +1,8 @@
 import { databaseUrl as url } from '../config/configuration.js'
-import { addNotification } from './notificationService.js'
 import * as data from "../api/data.js";
 
 export const addHero = async (hero, user) => {
     try {
-        console.log(`Adding ${JSON.stringify({
-            method: 'POST',
-            headers: {
-                'content-type': 'application/json',
-                'X-Authorization': user.accessToken
-            },
-            body: JSON.stringify(hero)
-        })}`);
         let response = await fetch(url + "create", {
             method: 'POST',
             headers: {
@@ -22,7 +13,6 @@ export const addHero = async (hero, user) => {
         });
         let result = await response.json();
         console.log(`response is ${response}`);
-        await createNotification(result, user);
         return result;
     } catch (error) {
         console.error(error)
@@ -60,17 +50,7 @@ export const deleteHero = async (hero, user) => {
             body: JSON.stringify(hero)
         });
         let result = await response.json();
-        // Notification for Edit
-        let notification =
-        {
-            who: user.email,
-            dateString: Date.now().toString(),
-            date: Date.now(),
-            text: `Deleted `,
-            recipe: hero._id,
-            recipeName: hero.name,
-        }
-        await addNotification(notification);
+        
         return result;
     } catch (error) {
         console.error(error)
@@ -123,15 +103,3 @@ export async function searchHeroes(searchText) {
     }
 }
 
-export async function createNotification(hero, user) {
-    let notification =
-    {
-        who: user.email,
-        dateString: Date.now().toString(),
-        date: Date.now(),
-        text: `Added `,
-        recipe: hero._id,
-        recipeName: hero.name,
-    }
-    await addNotification(notification);
-}
