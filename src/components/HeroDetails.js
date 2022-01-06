@@ -6,6 +6,7 @@ import { useHistory } from "react-router-dom";
 import "../css/fontawesome.min.css";
 import "../css/bootstrap.min.css";
 import "../css/templatemo-style.css";
+import { allowActionEveryMin } from "../config/configuration.js";
 
 export default function HeroDetails({ match }) {
   const [hero, setHero] = useState({});
@@ -13,6 +14,7 @@ export default function HeroDetails({ match }) {
   const { user } = useContext(AuthContext);
   let historyHook = useHistory();
   const [note, setNote] = useState("");
+  const isAdmin = false;
 
   useEffect(() => {
     async function fetchData() {
@@ -21,6 +23,8 @@ export default function HeroDetails({ match }) {
     }
     fetchData()
       .then((result) => {
+        let secondsAgo = (Date.now() - result.lastAction) / 1000;
+        console.log(`LAst action was ${secondsAgo} sec ago`);
         setHero(result);
       })
       .then(window.scrollTo(0, 0));
@@ -33,10 +37,9 @@ export default function HeroDetails({ match }) {
 
       setRerender(rerender + 1);
     });
-    getHeroById(hero._id)
-      .then((result) => {
-        setHero(result);
-      });
+    getHeroById(hero._id).then((result) => {
+      setHero(result);
+    });
   }
 
   function editButtonHandler(e) {
@@ -64,12 +67,48 @@ export default function HeroDetails({ match }) {
     historyHook.push(`/heroes/myheroes`);
   }
 
-   function plusButtonHandler(what, howMuch, e) {
+  function plusButtonHandler(what, howMuch, e) {
     console.log(`Plus button for ${what} ${howMuch}`);
     let upgradedHero = hero;
     upgradedHero[what] += howMuch;
+    upgradedHero.skillPoints -= 1;
     saveHero();
   }
+
+  async function healButtonHandler() {
+    let lifeDiffernece = hero.maxLife - hero.life;
+    if (lifeDiffernece === 0) return;
+    let newHero = hero;
+    // heal completely
+    if (hero.gold > 0 && hero.gold >= lifeDiffernece) {
+      newHero.life = hero.maxLife;
+      console.log(`${hero.life} - ${hero.maxLife}`);
+      newHero.gold -= lifeDiffernece;
+    } else if (hero.gold > 0) {
+      // heal for all the money
+      newHero.life += hero.gold;
+      newHero.gold = 0;
+    }
+    setHero(newHero);
+    saveHero();
+    setRerender();
+  }
+
+  async function healButtonTimeHandler() {
+    let lifeDiffernece = hero.maxLife - hero.life;
+    if (lifeDiffernece === 0) return;
+    let timeDifference =( Date.now() - hero.lastAction ) / 60000;
+    let periods = Math.floor(timeDifference / allowActionEveryMin);
+    let newHero = hero;
+      newHero.life += periods * 2;
+      if(newHero.life > newHero.maxLife)
+      newHero.life = newHero.maxLife;
+      newHero.lastAction = Date.now(); 
+    setHero(newHero);
+    saveHero();
+    setRerender();
+  }
+
   const ownerButtons = (
     <div className="col-6">
       <button
@@ -121,7 +160,7 @@ export default function HeroDetails({ match }) {
       </div>
     </div>
   ) : (
-    <>
+    <div>
       <ConfirmDialog
         show={note}
         onClose={() => setNote(false)}
@@ -144,62 +183,117 @@ export default function HeroDetails({ match }) {
                       <tbody>
                         <tr>
                           <td>Life</td>
-                          <td className="form-control">{hero.life}</td>
+                          <td className="form-control">
+                            {hero.life}
+                            {hero.life < hero.maxLife && hero.gold > 0 && (
+                              <button
+                                type="submit"
+                                className="btn btn-primary btn-block text-uppercase col-6"
+                                onClick={healButtonHandler}
+                              >
+                                Heal for gold!
+                              </button>
+                            )}
+                            {hero.life < hero.maxLife &&
+                              (Date.now() - hero.lastAction) / 60000 > allowActionEveryMin 
+                              && (
+                                <button
+                                  type="submit"
+                                  className="btn btn-primary btn-block text-uppercase col-6"
+                                  onClick={healButtonTimeHandler}
+                                >
+                                  Heal from time!
+                                </button>
+                              )}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Level</td>
+                          <td className="form-control">{hero.level}</td>
                         </tr>
                         <tr>
                           <td>Attack</td>
                           <td className="form-control">
                             {hero.attack}
-                            <button
-                              type="submit"
-                              className="btn btn-primary btn-block text-uppercase col-6"
-                              onClick={e => { plusButtonHandler("attack",1, e)}}
-                            >
-                              +
-                            </button>
+                            {(isAdmin === true || hero.skillPoints > 0) && (
+                              <button
+                                type="submit"
+                                className="btn btn-primary btn-block text-uppercase col-6"
+                                onClick={(e) => {
+                                  plusButtonHandler("attack", 1, e);
+                                }}
+                              >
+                                +
+                              </button>
+                            )}
                           </td>
                         </tr>
                         <tr>
                           <td>Defense</td>
                           <td className="form-control">
                             {hero.defense}
-                            <button
-                              type="submit"
-                              className="btn btn-primary btn-block text-uppercase col-6"
-                              onClick={e => { plusButtonHandler("defense",1, e)}}
-                            >
-                              +
-                            </button>
+                            {(isAdmin === true || hero.skillPoints > 0) && (
+                              <button
+                                type="submit"
+                                className="btn btn-primary btn-block text-uppercase col-6"
+                                onClick={(e) => {
+                                  plusButtonHandler("defense", 1, e);
+                                }}
+                              >
+                                +
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Health</td>
+                          <td className="form-control">
+                            {hero.health}
+                            {(isAdmin === true || hero.skillPoints > 0) && (
+                              <button
+                                type="submit"
+                                className="btn btn-primary btn-block text-uppercase col-6"
+                                onClick={(e) => {
+                                  plusButtonHandler("health", 1, e);
+                                }}
+                              >
+                                +
+                              </button>
+                            )}
                           </td>
                         </tr>
                         <tr>
                           <td>Experience</td>
                           <td className="form-control">
                             {hero.xp}
-                            <button
-                              type="submit"
-                              className="btn btn-primary btn-block text-uppercase col-6"
-                              onClick={(e) => {
-                                plusButtonHandler("xp", 1, e);
-                              }}
-                            >
-                              +
-                            </button>
+                            {isAdmin === true && (
+                              <button
+                                type="submit"
+                                className="btn btn-primary btn-block text-uppercase col-6"
+                                onClick={(e) => {
+                                  plusButtonHandler("xp", 1, e);
+                                }}
+                              >
+                                +
+                              </button>
+                            )}
                           </td>
                         </tr>
                         <tr>
                           <td>Gold</td>
                           <td className="form-control">
                             {hero.gold}
-                            <button
-                              type="submit"
-                              className="btn btn-primary btn-block text-uppercase col-6"
-                              onClick={(e) => {
-                                plusButtonHandler("gold", 20, e);
-                              }}
-                            >
-                              +
-                            </button>
+                            {isAdmin === true && (
+                              <button
+                                type="submit"
+                                className="btn btn-primary btn-block text-uppercase col-6"
+                                onClick={(e) => {
+                                  plusButtonHandler("gold", 20, e);
+                                }}
+                              >
+                                +
+                              </button>
+                            )}
                           </td>
                         </tr>
                       </tbody>
@@ -229,6 +323,6 @@ export default function HeroDetails({ match }) {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
