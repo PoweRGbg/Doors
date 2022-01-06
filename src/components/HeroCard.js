@@ -19,8 +19,7 @@ export default function HeroCard({ match }) {
     getHeroById(match.params.heroId)
       .then((result) => {
         // console.log(`Hero is now ${JSON.stringify(result)}`);
-        // set max health
-        result.maxLife = result.health * 100;
+        // set max life
         setHero(result);
       })
       .then((e) => {
@@ -47,36 +46,55 @@ export default function HeroCard({ match }) {
     console.log(
       `NewGoblin is ${newGoblin.health} health left Goblin is ${goblin.health}`
     );
-    if (goblin.health === 0) {
+    if (goblin.health <= 0) {
       // goblin is dead
       //add gold
       console.log(`Goblin is dead getting ${goblin.gold}`);
       newHero.gold += goblin.gold;
+      newHero.xp += goblin.xp;
+      //levelup hero
+      heroLevelUp();
+      console.log(`before save ${hero}`);
+      hero.lastAction = Date.now();
       saveHero();
+      historyHook.push(`/heroes/${hero._id}`);
     } else {
       console.log(`Goblin after damage ${JSON.stringify(goblin)}`);
       // It should retaliate
       newHero.life -= goblin.damage;
       setHero(newHero);
-      setRender(render+1);
+      setRender(render + 1);
 
       if (goblin.health < 1 || hero.life < 1) {
-          if(hero.life < 1){
-              saveHero();
-          }
+        if (hero.life < 1) {
+          saveHero();
+        }
         historyHook.push(`/heroes/${hero._id}`);
       }
     }
   }
 
-  function saveHero(){
+  async function heroLevelUp() {
+    //first calculate level
+    let nextLevelXp = 100 * Math.pow(1.5, hero.level - 1);
+    // Do we have so much
+    if (hero.xp >= nextLevelXp) {
+      let newHero = hero;
+      //add skillpoints
+      newHero.skillPoints += 2;
+      // change level
+      newHero.level += 1;
+      //save hero
+      return newHero;
+    }
+  }
+
+  function saveHero() {
     // save hero to database
     editHero(hero, user).then((updatedHero) => {
-        console.log(`Updated is ${updatedHero}`);
-        setHero(updatedHero);
-        historyHook.push(`/heroes/${hero._id}`);
-
-      });
+      setHero(updatedHero);
+      historyHook.push(`/heroes/${hero._id}`);
+    });
   }
 
   return (
@@ -97,16 +115,7 @@ export default function HeroCard({ match }) {
             <tr>
               <td>Life</td>
               <td>{hero?.life}</td>
-              <td>
-                {hero?.maxLife - hero?.life > 0 && hero?.gold > 0 && (
-                  <button
-                    className="btn btn-primary btn-block text-uppercase"
-                    onClick={() => {}}
-                  >
-                    Heal for gold {hero?.maxLife - hero?.life}
-                  </button>
-                )}
-              </td>
+
               <td>
                 {hero?.maxLife - hero?.life > 0 &&
                   (Date.now() - hero?.lastAttackTime) / 1000 > 10 && (
