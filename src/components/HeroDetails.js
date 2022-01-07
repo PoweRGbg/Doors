@@ -13,7 +13,6 @@ import {
 
 export default function HeroDetails({ match }) {
   const [hero, setHero] = useState({});
-  const [state, setState] = useState();
   const [rerender, setRerender] = useState(1);
   const { user } = useContext(AuthContext);
   let historyHook = useHistory();
@@ -36,12 +35,14 @@ export default function HeroDetails({ match }) {
       const interval = setInterval(() => {
         let secondsAgo = (Date.now() - hero.lastAction) / 1000;
         if((secondsAgo / 60) > allowActionEveryMin ){
+            console.log(`Healing automatically`);
+            healButtonTimeHandler();
             setRerender(rerender+1);
         }
         console.log(`Last action was ${secondsAgo}`);
       }, 60000);
       return () => clearInterval(interval);
-  }, [match.params.heroId, rerender]);
+  }, [match.params.heroId, rerender, hero.lastAction]);
 
 
 
@@ -124,6 +125,7 @@ export default function HeroDetails({ match }) {
     newHero.lastAction = Date.now();
     setHero(newHero);
     saveHero();
+    console.log(`Healed ${periods*lifepointsEveryPeriod}`);
     setRerender();
   }
 

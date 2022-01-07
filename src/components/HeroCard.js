@@ -29,6 +29,7 @@ export default function HeroCard({ match }) {
 
   function initialGoblin() {
     let goblin = {
+      name: "Goblin",
       health: 10,
       xp: 10,
       level: 1,
@@ -43,13 +44,10 @@ export default function HeroCard({ match }) {
     let newHero = hero;
     newGoblin.health -= hero.attack;
     setGoblin(newGoblin);
-    console.log(
-      `NewGoblin is ${newGoblin.health} health left Goblin is ${goblin.health}`
-    );
     if (goblin.health <= 0) {
       // goblin is dead
       //add gold
-      console.log(`Goblin is dead getting ${goblin.gold}`);
+      console.log(`Goblin is dead getting ${goblin.gold} gold`);
       newHero.gold += goblin.gold;
       newHero.xp += goblin.xp;
       //levelup hero
