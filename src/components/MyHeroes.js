@@ -152,7 +152,7 @@ function MyHeroes({ user }) {
                   to="/addHero"
                   className="btn btn-primary btn-block text-uppercase mb-3"
                 >
-                  Add new recipe
+                  Add hero
                 </Link>
               </div>
             )}

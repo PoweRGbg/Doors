@@ -1,5 +1,5 @@
 import AuthContext from "../contexts/AuthContext";
-import { useEffect, useState, useContext, useInterval } from "react";
+import { useEffect, useState, useContext } from "react";
 import { getHeroById, deleteHero, editHero } from "../services/heroService";
 import ConfirmDialog from "./ConfirmDialog.js";
 import { useHistory } from "react-router-dom";
@@ -28,7 +28,8 @@ export default function HeroDetails({ match }) {
     fetchData()
       .then((result) => {
         let secondsAgo = (Date.now() - result.lastAction) / 1000;
-        console.log(`LAst action was ${secondsAgo} sec ago`);
+        console.log(`Last action was ${secondsAgo} sec ago`);
+        console.log(`hero is ${JSON.stringify(result)}`);
         setHero(result);
       })
       .then(window.scrollTo(0, 0));
@@ -171,7 +172,7 @@ export default function HeroDetails({ match }) {
             <div className="row tm-edit-product-row">
               <div className="col-xl-6 col-lg-6 col-md-12">
                 <div className="form-group mb-3">
-                  <center>ERROR FETCHING HERO FROM DATABASE!</center>
+                  <center>ERROR FETCHING HERO FROM DATABASE!{JSON.stringify(hero)}</center>
                 </div>
               </div>
             </div>

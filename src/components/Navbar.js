@@ -49,7 +49,7 @@ export default function Navbar() {
     <nav className="navbar navbar-expand-xl">
       <div className="container h-100">
         <Link className="navbar-brand" to="/" onClick={clickHandler}>
-          <h1 className="tm-site-title mb-0">Meals</h1>
+          <h1 className="tm-site-title mb-0">Heroes</h1>
         </Link>
         <button
           className="navbar-toggler ml-auto mr-0"
@@ -106,7 +106,7 @@ export default function Navbar() {
                       to="/heroes/myheroes"
                       onClick={clickHandler}
                     >
-                      My meals
+                      My heroes
                     </Link>
                   ) : (
                     ""
