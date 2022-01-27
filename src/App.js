@@ -1,9 +1,7 @@
 import { Route, Switch } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import Content from "./components/Content";
 import NotificationsList from "./components/NotificationsList";
-import MealsTable from "./components/HeroesTable";
 import HeroDetails from "./components/HeroDetails";
 import AddHeroCard from "./components/AddHeroCard";
 import HeroCard from "./components/HeroCard";
