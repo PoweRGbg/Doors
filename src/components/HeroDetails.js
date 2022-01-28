@@ -21,57 +21,61 @@ export default function HeroDetails({ match }) {
   user._id = "something";
 
   useEffect(() => {
-    async function fetchData() {
-      let result = await getHeroById(match.params.heroId);
-      return result;
+    function fetchData() {
+      if (match.params.heroId === undefined) {
+        console.log(`Error! Getting undefined id!`);
+      }
+      return new Promise(function (resolve) {
+        getHeroById(match.params.heroId).then((result) => {
+          // console.log(`Result in details is ${JSON.stringify(result)}`);
+          resolve(result);
+        });
+      });
     }
+
     fetchData()
       .then((result) => {
         let secondsAgo = (Date.now() - result.lastAction) / 1000;
-        console.log(`Last action was ${secondsAgo} sec ago`);
-        console.log(`hero is ${JSON.stringify(result)}`);
+        console.log(`Last action was ${Math.round(secondsAgo)} sec ago`);
+        // console.log(`hero is ${JSON.stringify(result)}`);
         setHero(result);
       })
       .then(window.scrollTo(0, 0));
-      const interval = setInterval(() => {
-        let secondsAgo = (Date.now() - hero.lastAction) / 1000;
-        if((secondsAgo / 60) > allowActionEveryMin ){
-            console.log(`Healing automatically`);
-            healButtonTimeHandler();
-            setRerender(rerender+1);
-        }
-        console.log(`Last action was ${secondsAgo}`);
-      }, 60000);
-      return () => clearInterval(interval);
+    const interval = setInterval(() => {
+      let secondsAgo = (Date.now() - hero.lastAction) / 1000;
+      if (secondsAgo / 60 > allowActionEveryMin) {
+        console.log(`Healing automatically`);
+        let lifeDiffernece = hero.maxLife - hero.life;
+        if (lifeDiffernece === 0) return;
+        let timeDifference = (Date.now() - hero.lastAction) / 60000;
+        let periods = Math.floor(timeDifference / allowActionEveryMin);
+        let newHero = hero;
+        newHero.life += periods * lifepointsEveryPeriod;
+        if (newHero.life > newHero.maxLife) newHero.life = newHero.maxLife;
+        newHero.lastAction = Date.now();
+        compareHeroes(hero, newHero);
+        setHero(newHero);
+        saveHero();
+        console.log(`Healed ${periods * lifepointsEveryPeriod} for ${timeDifference} min`);
+        setRerender(rerender + 1);
+      }
+      console.log(`Last action was ${secondsAgo}`);
+    }, 60000);
+    return () => clearInterval(interval);
   }, [match.params.heroId, rerender, hero.lastAction]);
 
-
-
   function saveHero() {
+      console.log(`Saving hero!`);
     editHero(hero, user).then((updatedHero) => {
-      console.log(`Updated is ${updatedHero}`);
-      setHero(updatedHero);
+      console.log(`Updated is ${JSON.stringify(updatedHero)}`);
+    //   setHero(updatedHero);
 
-      setRerender(rerender + 1);
     });
-    getHeroById(hero._id).then((result) => {
-      setHero(result);
-    });
-  }
-
-  function editButtonHandler(e) {
-    e.preventDefault();
-    historyHook.push(`/edit/${hero._id}`);
   }
 
   function trainButtonHandler(e) {
     e.preventDefault();
-    historyHook.push(`/train/${hero._id}`);
-  }
-
-  function deleteButtonHandler(e) {
-    e.preventDefault();
-    setNote(`Are you sure you want to remove hero ${hero.name}?`);
+    historyHook.push(`/train/${match.params.heroId}`);
   }
 
   function goBackHandler(e) {
@@ -110,6 +114,7 @@ export default function HeroDetails({ match }) {
       newHero.life += hero.gold;
       newHero.gold = 0;
     }
+    compareHeroes(hero, newHero);
     setHero(newHero);
     saveHero();
     setRerender(rerender + 1);
@@ -124,30 +129,21 @@ export default function HeroDetails({ match }) {
     newHero.life += periods * lifepointsEveryPeriod;
     if (newHero.life > newHero.maxLife) newHero.life = newHero.maxLife;
     newHero.lastAction = Date.now();
+    compareHeroes(hero, newHero);
     setHero(newHero);
     saveHero();
-    console.log(`Healed ${periods*lifepointsEveryPeriod}`);
-    setRerender();
+    console.log(`Healed ${periods * lifepointsEveryPeriod} for ${timeDifference} min`);
+    setRerender(rerender + 1);
   }
 
-  const ownerButtons = (
-    <div className="col-6">
-      <button
-        type="submit"
-        className="btn btn-primary btn-block text-uppercase"
-        onClick={editButtonHandler}
-      >
-        Edit
-      </button>
-      <button
-        type="submit"
-        className="btn btn-primary btn-block text-uppercase"
-        onClick={deleteButtonHandler}
-      >
-        Delete
-      </button>
-    </div>
-  );
+  function compareHeroes(oldOne, newOne){
+      let keys = Object.keys(newOne);
+      for(let i = 0; i<keys.length; i++){
+          if(newOne[keys[i]] !== oldOne[keys[i]]){
+              console.log(`${keys[i]} is  ${newOne[keys[i]]} from ${oldOne[keys[i]]}`);
+          }
+      }
+  }
 
   const trainButton = (
     <div className="col-6">
@@ -161,26 +157,7 @@ export default function HeroDetails({ match }) {
     </div>
   );
 
-  return hero.name === undefined ? (
-    <div className="container tm-mt-big tm-mb-big">
-      <div className="row">
-        <div className="col-xl-9 col-lg-10 col-md-12 col-sm-12 mx-auto">
-          <div className="tm-bg-primary-dark tm-block tm-block-h-auto">
-            <div className="row">
-              <div className="col-12"></div>
-            </div>
-            <div className="row tm-edit-product-row">
-              <div className="col-xl-6 col-lg-6 col-md-12">
-                <div className="form-group mb-3">
-                  <center>ERROR FETCHING HERO FROM DATABASE!{JSON.stringify(hero)}</center>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  ) : (
+  return (
     <div>
       <ConfirmDialog
         show={note}
@@ -323,7 +300,7 @@ export default function HeroDetails({ match }) {
                   <div>{trainButton}</div>
                   <div className="row">
                     <div className="custom-file mt-3 mb-3">
-                      {hero._ownerId === user._id ? ownerButtons : ""}
+                      {hero._ownerId === user._id ? "" : ""}
                     </div>
                   </div>
                 </div>

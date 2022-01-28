@@ -1,4 +1,6 @@
-import { databaseUrl as url } from '../config/configuration.js'
+import {
+    databaseUrl as url
+} from '../config/configuration.js'
 import * as data from "../api/data.js";
 
 export const addHero = async (hero, user) => {
@@ -20,28 +22,46 @@ export const addHero = async (hero, user) => {
 
 }
 export const editHero = async (hero, user) => {
-    // console.log(`Updating ${JSON.stringify(hero)}`);
-    try {
-        let response = await fetch(url + "update", {
-            method: 'PUT',
-            headers: {
-                'content-type': 'application/json',
-                'X-Authorization': user.accessToken
-            },
-            body: JSON.stringify(hero)
+        return new Promise(function(resolve) {
+            console.log(`Updating ${hero.name}`);
+            fetch(url + "update", {
+                method: 'PUT',
+                headers: {
+                    'content-type': 'application/json',
+                    'X-Authorization': user.accessToken
+                },
+                body: JSON.stringify(hero)
+            }).then(result => {
+                result.json()
+                .then(result => {
+                        console.log(`returned hero is ${result.name}`);
+                        resolve(result);
+                    });
+        
+            }).catch(error => {
+                console.log(`Error: ${error}`);
+            });
         });
-        let result = await response.json();
-        console.log(`Result is ${result}`);
-        return result;
-    } catch (error) {
-        console.error(error)
-    };
+    //     let response = await fetch(url + "update", {
+    //         method: 'PUT',
+    //         headers: {
+    //             'content-type': 'application/json',
+    //             'X-Authorization': user.accessToken
+    //         },
+    //         body: JSON.stringify(hero)
+    //     });
+    //     let result = await response.json();
+    //     console.log(`Result after update is ${result}`);
+    //     return result;
+    // } catch (error) {
+    //     console.error(error)
+    // };
 
 }
 
 export const deleteHero = async (hero, user) => {
     try {
-        let response = await fetch(url + "data/heroes/"+hero._id, {
+        let response = await fetch(url + "data/heroes/" + hero._id, {
             method: 'DELETE',
             headers: {
                 'content-type': 'application/json',
@@ -50,7 +70,7 @@ export const deleteHero = async (hero, user) => {
             body: JSON.stringify(hero)
         });
         let result = await response.json();
-        
+
         return result;
     } catch (error) {
         console.error(error)
@@ -69,18 +89,22 @@ export async function getHeroes() {
     }
 }
 
-export async function getHeroById(id) {
-    try {
-        let heroes = await fetch(url + "details/"+id, {
+export function getHeroById(id) {
+    return new Promise(function(resolve) {
+        fetch(url + "details/" + id, {
             method: 'GET'
+        }).then(heroes => {
+            heroes.json()
+            .then(result => {
+                    resolve(result);
+                });
+    
+        }).catch(error => {
+            console.log(`Error: ${error}`);
         });
-        let result = await heroes.json();
+    
+      });
 
-        return result;
-
-    } catch (error) {
-        console.error(`Failed fetching hero ${id}!`);
-    }
 }
 
 export async function getHeroesByOwner(ownerId) {
@@ -89,7 +113,7 @@ export async function getHeroesByOwner(ownerId) {
         return heroes;
 
     } catch (error) {
-        console.error('Failed fetching heroes for '+ownerId);
+        console.error('Failed fetching heroes for ' + ownerId);
     }
 }
 
@@ -99,7 +123,6 @@ export async function searchHeroes(searchText) {
         return heroes;
 
     } catch (error) {
-        console.error('Failed fetching heroes for text '+searchText);
+        console.error('Failed fetching heroes for text ' + searchText);
     }
 }
-

@@ -39,7 +39,7 @@ export default function HeroCard({ match }) {
     return goblin;
   }
 
-  function attackButtonHandler() {
+  async function attackButtonHandler() {
     let newGoblin = goblin;
     let newHero = hero;
     newGoblin.health -= hero.attack;
@@ -52,9 +52,9 @@ export default function HeroCard({ match }) {
       newHero.xp += goblin.xp;
       //levelup hero
       heroLevelUp();
-      console.log(`before save ${hero}`);
+      // console.log(`before save ${JSON.stringify(hero)}`);
       hero.lastAction = Date.now();
-      saveHero();
+      await saveHero();
       historyHook.push(`/heroes/${hero._id}`);
     } else {
       // It should retaliate
